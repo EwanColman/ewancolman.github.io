@@ -30,7 +30,7 @@ twitter_username: ewancolman
 github_username:  EwanColman
 
 # Build settings
-theme: minima
+theme: merlot
 plugins:
   - jekyll-feed
 
