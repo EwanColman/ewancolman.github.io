@@ -1,112 +1,106 @@
-<!doctype html>
-
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<head>
-  <meta charset="utf-8">
-
-  <title>Javascript test</title>
-</head>
-
-
 <body>
-
 <div id="myPlot" style="width:100%;max-width:700px"></div>
 
-<script>
 
-Plotly.newPlot('myPlot', {
-  data: [{
-    x: [1, 2, 3],
-    y: [2, 1, 3],
-    line: {
-      color: 'red',
-      simplify: false,
-    }
-  }],
-  layout: {
-    sliders: [{
-      pad: {t: 30},
-      x: 0.05,
-      len: 0.95,
-      currentvalue: {
-        xanchor: 'right',
-        prefix: 'color: ',
-        font: {
-          color: '#888',
-          size: 20
-        }
-      },
-      transition: {duration: 500},
-      // By default, animate commands are bound to the most recently animated frame:
-      steps: [{
-        label: 'red',
-        method: 'animate',
-        args: [['red'], {
-          mode: 'immediate',
-          frame: {redraw: false, duration: 500},
-          transition: {duration: 500}
-        }]
-      }, {
-        label: 'green',
-        method: 'animate',
-        args: [['green'], {
-          mode: 'immediate',
-          frame: {redraw: false, duration: 500},
-          transition: {duration: 500}
-        }]
-      }, {
-        label: 'blue',
-        method: 'animate',
-        args: [['blue'], {
-          mode: 'immediate',
-          frame: {redraw: false, duration: 500},
-          transition: {duration: 500}
-        }]
-      }]
-    }],
-    updatemenus: [{
-      type: 'buttons',
-      showactive: false,
-      x: 0.05,
-      y: 0,
-      xanchor: 'right',
-      yanchor: 'top',
-      pad: {t: 60, r: 20},
-      buttons: [{
-        label: 'Play',
-        method: 'animate',
-        args: [null, {
-          fromcurrent: true,
-          frame: {redraw: false, duration: 1000},
-          transition: {duration: 500}
-        }]
-      }]
-    }]
-  },
-  // The slider itself does not contain any notion of timing, so animating a slider
-  // must be accomplished through a sequence of frames. Here we'll change the color
-  // and the data of a single trace:
-  frames: [{
-    name: 'red',
-    data: [{
-      y: [2, 1, 3],
-      'line.color': 'red'
-    }]
-  }, {
-    name: 'green',
-    data: [{
-      y: [3, 2, 1],
-      'line.color': 'green'}]
-  }, {
-    name: 'blue',
-    data: [{
-      y: [1, 3, 2],
-      'line.color': 'blue'}]
-  }]
-});
+<p>Text for slider1.</p>
+
+<div class="slidecontainer">
+  <input type="range" min="1" max="5" value="1" id="myRange1">
+  <p>Value: <span id="demo1"></span></p>
+</div>
+
+<p>Text for slider 2.</p>
+<div class="slidecontainer">
+  <input type="range" min="1" max="5" value="1" id="myRange2">
+  <p>Value: <span id="demo2"></span></p>
+</div>
+
+<script>
+// start javascript
+
+// define a variable that contains the data
+const data_series = {'11':[1.0, 2.0, 3.14, 4.35, 5.59, 6.87, 8.18, 9.5, 10.85, 12.21],
+'12':[1.0, 2.0, 3.3, 4.74, 6.28, 7.9, 9.59, 11.33, 13.13, 14.97],
+'13':[1.0, 2.0, 3.46, 5.17, 7.06, 9.1, 11.27, 13.55, 15.93, 18.4],
+'14':[1.0, 2.0, 3.64, 5.66, 7.96, 10.52, 13.29, 16.25, 19.38, 22.67],
+'15':[1.0, 2.0, 3.83, 6.2, 9.0, 12.18, 15.7, 19.52, 23.63, 28.0],
+'21':[2.0, 3.0, 4.14, 5.35, 6.59, 7.87, 9.18, 10.5, 11.85, 13.21],
+'22':[2.0, 3.0, 4.3, 5.74, 7.28, 8.9, 10.59, 12.33, 14.13, 15.97],
+'23':[2.0, 3.0, 4.46, 6.17, 8.06, 10.1, 12.27, 14.55, 16.93, 19.4],
+'24':[2.0, 3.0, 4.64, 6.66, 8.96, 11.52, 14.29, 17.25, 20.38, 23.67],
+'25':[2.0, 3.0, 4.83, 7.2, 10.0, 13.18, 16.7, 20.52, 24.63, 29.0],
+'31':[3.0, 4.0, 5.14, 6.35, 7.59, 8.87, 10.18, 11.5, 12.85, 14.21],
+'32':[3.0, 4.0, 5.3, 6.74, 8.28, 9.9, 11.59, 13.33, 15.13, 16.97],
+'33':[3.0, 4.0, 5.46, 7.17, 9.06, 11.1, 13.27, 15.55, 17.93, 20.4],
+'34':[3.0, 4.0, 5.64, 7.66, 9.96, 12.52, 15.29, 18.25, 21.38, 24.67],
+'35':[3.0, 4.0, 5.83, 8.2, 11.0, 14.18, 17.7, 21.52, 25.63, 30.0],
+'41':[4.0, 5.0, 6.14, 7.35, 8.59, 9.87, 11.18, 12.5, 13.85, 15.21],
+'42':[4.0, 5.0, 6.3, 7.74, 9.28, 10.9, 12.59, 14.33, 16.13, 17.97],
+'43':[4.0, 5.0, 6.46, 8.17, 10.06, 12.1, 14.27, 16.55, 18.93, 21.4],
+'44':[4.0, 5.0, 6.64, 8.66, 10.96, 13.52, 16.29, 19.25, 22.38, 25.67],
+'45':[4.0, 5.0, 6.83, 9.2, 12.0, 15.18, 18.7, 22.52, 26.63, 31.0],
+'51':[5.0, 6.0, 7.14, 8.35, 9.59, 10.87, 12.18, 13.5, 14.85, 16.21],
+'52':[5.0, 6.0, 7.3, 8.74, 10.28, 11.9, 13.59, 15.33, 17.13, 18.97],
+'53':[5.0, 6.0, 7.46, 9.17, 11.06, 13.1, 15.27, 17.55, 19.93, 22.4],
+'54':[5.0, 6.0, 7.64, 9.66, 11.96, 14.52, 17.29, 20.25, 23.38, 26.67],
+'55':[5.0, 6.0, 7.83, 10.2, 13.0, 16.18, 19.7, 23.52, 27.63, 32.0]}
+					
+
+// function for producing the plot
+function makePlot(yData){
+	var xArray = [1,2,3,4,5,6,7,8,9,10];
+	var yArray = yData;
+	var data = [{x: xArray, y: yArray, mode:"lines"}];
+
+	// Define Layout
+	var layout = {xaxis: {range: [0, 11], title: "X variable"}, 
+				yaxis: {range: [0, 30], title: "Y variable"},  
+				title: "X vs. Y"};
+
+	// Display using Plotly
+	Plotly.newPlot("myPlot", data, layout);
+}
+
+//start with the default plot
+makePlot(data_series['11'])
+
+
+
+// "slider" is the object associated with the slider input
+var slider1 = document.getElementById("myRange1");
+// "output" is the what gets printed out
+var output1 = document.getElementById("demo1");
+
+// "slider" is the object associated with the slider input
+var slider2 = document.getElementById("myRange2");
+// "output" is the what gets printed out
+var output2 = document.getElementById("demo2");
+
+
+// set the printed output equal to the slider input (for before slider has been interacted with)
+output1.innerHTML = slider1.value;
+output2.innerHTML = slider2.value;
+
+// actions to occur as soon as slider has been interacted with
+slider1.oninput = function() {
+	// set the printed output equal to the slider input
+	output1.innerHTML = slider1.value;
+	// replace the current plot with a new one
+	makePlot(data_series[String(slider1.value)+String(slider2.value)])
+}
+
+slider2.oninput = function() {
+	// set the printed output equal to the slider input
+	output2.innerHTML = slider2.value;
+	// replace the current plot with a new one
+	makePlot(data_series[String(slider1.value)+String(slider2.value)])
+}
 
 </script>
+
 
 </body>
 </html>
