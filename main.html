@@ -1,103 +1,364 @@
 <!DOCTYPE html>
 <html>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<head>
+<style>
+
+table {
+  border-collapse: collapse;
+}
+
+
+tr {
+  border-bottom: 1px solid #ddd;
+}  
+
+th {
+	padding-left: 20px
+  text-align: left;
+}
+
+td {padding-left: 20px}
+
+.slidecontainer {
+	
+	width: 150px;
+	
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 70px;
+  height: 10px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: #04AA6D;
+  cursor: pointer;
+</style>
+</head>
+
 <body>
 <div id="myPlot" style="width:100%;max-width:700px"></div>
 
+<p>Infection rate</p>
+<table>
+  <tr>
+	<th>I->S</th>
+	<th>Unvaccinated</th>
+    <th>Vaccinated</th>
+  </tr>
+  <tr>
+	<td><b>Unvaccinated</b></td>
+    <td><div class="slidecontainer">
+	<p> &beta;<sub>uu</sub> = <span id="uu"></span></p>
+  <input type="range" min="0" max="0.1" value="0.01" step="0.001" id="uu_range" class=slider>
+</div></td>
+    <td><div class="slidecontainer">
+	<p> &beta;<sub>uv</sub> = <span id="uv"></span></p>
+	<input type="range" min="0" max="0.1" value="0.01" step="0.001" id="uv_range" class=slider>
+</div></td>
+  </tr>
+  <tr>
+	<td><b>Vaccinated</b></td>
+    <td><div class="slidecontainer">
+	<p> &beta;<sub>vu</sub> = <span id="vu"></span></p>
+	<input type="range" min="0" max="0.1" value="0.01" step="0.001" id="vu_range" class=slider>
+</div></td>
+    <td><div class="slidecontainer">
+ <p> &beta;<sub>vv</sub> = <span id="vv"></span></p> 
+ <input type="range" min="0" max="0.1" value="0.01" step="0.001" id="vv_range" class=slider>
+ 
+</div></td>
+  </tr>
+</table>
 
-<p>Text for slider1.</p>
+<p> &nbsp </p>
 
-<div class="slidecontainer">
-  <input type="range" min="1" max="5" value="1" id="myRange1">
-  <p>Value: <span id="demo1"></span></p>
-</div>
+<table>
+  <tr>
+	<th>Age range</th>
+	<th>Size of group</th>
+    <th>Mean number of contacts</th>
+    <th>Vaccination acceptance</th>
+  </tr>
+  <tr>
+	<td>1 - 10</td>
+    <td><div class="slidecontainer">
+	  <p> <span id="n1"></span>
+  <input type="range" min="0" max="1000000" value="700000" step="10000" id="n1_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="c1"></span>
+  <input type="range" min="0" max="30" value="5" id="c1_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="v1"></span>
+  <input type="range" min="0" max="100" value="5" id="v1_range" class=slider></p>
+  </td>
+  </tr>
+  <tr>
+	<td>11 - 20</td>
+    <td><div class="slidecontainer">
+	  <p> <span id="n2"></span>
+  <input type="range" min="0" max="1000000" value="750000" step="10000" id="n2_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="c2"></span>
+  <input type="range" min="0" max="30" value="20" id="c2_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="v2"></span>
+  <input type="range" min="0" max="100" value="50" id="v2_range" class=slider></p>
+  </td>
+  </tr>
+  <tr>
+	<td>21 - 30</td>
+    <td><div class="slidecontainer">
+	  <p> <span id="n3"></span>
+  <input type="range" min="0" max="1000000" value="700000" step="10000" id="n3_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="c3"></span>
+  <input type="range" min="0" max="30" value="25" id="c3_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="v3"></span>
+  <input type="range" min="0" max="100" value="70" id="v3_range" class=slider></p>
+  </td>
+  </tr>
+  <tr>
+	<td>31 - 40</td>
+    <td><div class="slidecontainer">
+	  <p> <span id="n4"></span>
+  <input type="range" min="0" max="1000000" value="650000" step="10000" id="n4_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="c4"></span>
+  <input type="range" min="0" max="30" value="15" id="c4_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="v4"></span>
+  <input type="range" min="0" max="100" value="80" id="v4_range" class=slider></p>
+  </td>
+  </tr>
+  <tr>
+	<td>51 - 60</td>
+        <td><div class="slidecontainer">
+		  <p> <span id="n5"></span>
+  <input type="range" min="0" max="1000000" value="600000" step="10000" id="n5_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="c5"></span>
+  <input type="range" min="0" max="30" value="10" id="c5_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="v5"></span>
+  <input type="range" min="0" max="100" value="90" id="v5_range" class=slider></p>
+  </td>
+  </tr>
+  </tr>
+  <tr>
+	<td>61 - 70</td>
+    <td><div class="slidecontainer">
+	  <p> <span id="n6"></span>
+  <input type="range" min="0" max="1000000" value="500000" step="10000" id="n6_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="c6"></span>
+  <input type="range" min="0" max="30" value="5" id="c6_range" class=slider></p>
+</div></td>
+    <td><div class="slidecontainer">
+	  <p> <span id="v6"></span>
+  <input type="range" min="0" max="100" value="95" id="v6_range" class=slider></p>
+  </td>
+  </tr>
+</table>
 
-<p>Text for slider 2.</p>
-<div class="slidecontainer">
-  <input type="range" min="1" max="5" value="1" id="myRange2">
-  <p>Value: <span id="demo2"></span></p>
-</div>
+
+
+
 
 <script>
 // start javascript
+// function for producing the data series
+function generateData(slider){
 
-// define a variable that contains the data
-const data_series = {'11':[1.0, 2.0, 3.14, 4.35, 5.59, 6.87, 8.18, 9.5, 10.85, 12.21],
-'12':[1.0, 2.0, 3.3, 4.74, 6.28, 7.9, 9.59, 11.33, 13.13, 14.97],
-'13':[1.0, 2.0, 3.46, 5.17, 7.06, 9.1, 11.27, 13.55, 15.93, 18.4],
-'14':[1.0, 2.0, 3.64, 5.66, 7.96, 10.52, 13.29, 16.25, 19.38, 22.67],
-'15':[1.0, 2.0, 3.83, 6.2, 9.0, 12.18, 15.7, 19.52, 23.63, 28.0],
-'21':[2.0, 3.0, 4.14, 5.35, 6.59, 7.87, 9.18, 10.5, 11.85, 13.21],
-'22':[2.0, 3.0, 4.3, 5.74, 7.28, 8.9, 10.59, 12.33, 14.13, 15.97],
-'23':[2.0, 3.0, 4.46, 6.17, 8.06, 10.1, 12.27, 14.55, 16.93, 19.4],
-'24':[2.0, 3.0, 4.64, 6.66, 8.96, 11.52, 14.29, 17.25, 20.38, 23.67],
-'25':[2.0, 3.0, 4.83, 7.2, 10.0, 13.18, 16.7, 20.52, 24.63, 29.0],
-'31':[3.0, 4.0, 5.14, 6.35, 7.59, 8.87, 10.18, 11.5, 12.85, 14.21],
-'32':[3.0, 4.0, 5.3, 6.74, 8.28, 9.9, 11.59, 13.33, 15.13, 16.97],
-'33':[3.0, 4.0, 5.46, 7.17, 9.06, 11.1, 13.27, 15.55, 17.93, 20.4],
-'34':[3.0, 4.0, 5.64, 7.66, 9.96, 12.52, 15.29, 18.25, 21.38, 24.67],
-'35':[3.0, 4.0, 5.83, 8.2, 11.0, 14.18, 17.7, 21.52, 25.63, 30.0],
-'41':[4.0, 5.0, 6.14, 7.35, 8.59, 9.87, 11.18, 12.5, 13.85, 15.21],
-'42':[4.0, 5.0, 6.3, 7.74, 9.28, 10.9, 12.59, 14.33, 16.13, 17.97],
-'43':[4.0, 5.0, 6.46, 8.17, 10.06, 12.1, 14.27, 16.55, 18.93, 21.4],
-'44':[4.0, 5.0, 6.64, 8.66, 10.96, 13.52, 16.29, 19.25, 22.38, 25.67],
-'45':[4.0, 5.0, 6.83, 9.2, 12.0, 15.18, 18.7, 22.52, 26.63, 31.0],
-'51':[5.0, 6.0, 7.14, 8.35, 9.59, 10.87, 12.18, 13.5, 14.85, 16.21],
-'52':[5.0, 6.0, 7.3, 8.74, 10.28, 11.9, 13.59, 15.33, 17.13, 18.97],
-'53':[5.0, 6.0, 7.46, 9.17, 11.06, 13.1, 15.27, 17.55, 19.93, 22.4],
-'54':[5.0, 6.0, 7.64, 9.66, 11.96, 14.52, 17.29, 20.25, 23.38, 26.67],
-'55':[5.0, 6.0, 7.83, 10.2, 13.0, 16.18, 19.7, 23.52, 27.63, 32.0]}
-					
+	let variables = ["uu","uv","vu","vv"];
+
+	for (let i = 1; i < 7;i++){
+		variables.push("n"+i)
+		variables.push("c"+i)
+		variables.push("v"+i)
+	}
+	
+	let p={};
+	
+	// take the variables that are in 'slider' and make the syntax shorter and convert ranges
+	for (let i = 0; i < variables.length;i++) {
+		p[variables[i]]=parseFloat(slider[variables[i]].value)
+		if (variables[i][0]=="v" && variables[i][1]!="u" && variables[i][1]!="v"){
+			// convert percentage to proportion
+			p[variables[i]]=p[variables[i]]/100
+		}
+	}
+
+	var E = 0
+	for (let i = 1; i < 7;i++){
+		E=E+p["n"+i]*p["c"+i]
+		}
+
+	var y_series = []
+	// v is vaccines offered
+	for (let j = 0; j < 101; j++){
+		let v=j/100
+		
+		var m11=0
+		for (let i = 1; i < 7;i++){
+			m11=m11+(1-v*p["v"+i])*p["n"+i]*p["c"+i]*p["c"+i]
+			}
+		m11=p["uu"]*m11/E
+		
+		var m12 = 0
+		for (let i = 1; i < 7;i++){
+			m12=m12+v*p["v"+i]*p["n"+i]*p["c"+i]*p["c"+i]
+			}
+		m12=p["uv"]*m12/E
+			
+		var m21 = 0
+		for (let i = 1; i < 7;i++){
+			m21=m21+(1-v*p["v"+i])*p["n"+i]*p["c"+i]*p["c"+i]
+			}
+		m21=p["vu"]*m21/E
+		
+		var m22 = 0
+		for (let i = 1; i < 7;i++){
+			m22=m22+v*p["v"+i]*p["n"+i]*p["c"+i]*p["c"+i]
+			}
+		m22=p["vv"]*m22/E
+	
+
+		var R0 = ((m11+m22)+Math.sqrt(((m11-m22)**2)+4*m21*m12))/2
+
+		y_series.push(R0);
+	}
+
+return y_series;
+}
+
 
 // function for producing the plot
 function makePlot(yData){
-	var xArray = [1,2,3,4,5,6,7,8,9,10];
+	var xArray = [];
+	for (let v = 0; v < 101;v++){
+		xArray.push(v)
+		}
+	
 	var yArray = yData;
-	var data = [{x: xArray, y: yArray, mode:"lines"}];
+	var data = [{x: xArray, y: yArray, mode:"lines",line: {simplify: false}}];
 
 	// Define Layout
-	var layout = {xaxis: {range: [0, 11], title: "X variable"}, 
-				yaxis: {range: [0, 30], title: "Y variable"},  
-				title: "X vs. Y"};
+	var layout = {xaxis: {range: [0, 101], title: "Percent of population offered the vaccine"}, 
+				yaxis: {range: [0, 2], title: "R0"},  
+				title: "Effect of vaccination on R0"};
 
 	// Display using Plotly
-	Plotly.newPlot("myPlot", data, layout);
+	Plotly.newPlot("myPlot", {data:data, layout:layout});
 }
 
-//start with the default plot
-makePlot(data_series['11'])
+// function for changing the plot data
+function movePlot(yData){
+
+	//document.getElementById("R0").innerHTML = yData;
+	
+	Plotly.animate('myPlot', {data: [{y: yData}],
+    traces: [0],
+    layout: {}
+  }, {
+    transition: {duration: 0},
+    frame: {duration: 0}
+  });
+}
 
 
 
-// "slider" is the object associated with the slider input
-var slider1 = document.getElementById("myRange1");
-// "output" is the what gets printed out
-var output1 = document.getElementById("demo1");
+let slider={}
+let output={}
 
-// "slider" is the object associated with the slider input
-var slider2 = document.getElementById("myRange2");
-// "output" is the what gets printed out
-var output2 = document.getElementById("demo2");
+let variables = ["uu","uv","vu","vv"];
 
+for (let i = 1; i < 7;i++){
+	variables.push("n"+i)
+	variables.push("c"+i)
+	variables.push("v"+i)
+}
 
-// set the printed output equal to the slider input (for before slider has been interacted with)
-output1.innerHTML = slider1.value;
-output2.innerHTML = slider2.value;
+for (let i = 0; i < variables.length;i++) {   
+	//////////////////////////////////////////////////////
+	// "slider" is the object associated with the slider input     
+    slider[variables[i]] = document.getElementById(variables[i]+"_range");
+    // "output" is the what gets printed out
+	output[variables[i]] = document.getElementById(variables[i]);
+	
+	output[variables[i]].innerHTML = slider[variables[i]].value;
+}
 
+// annoyingly can't put oninput functions in a loop, so lots of coied code here:
+// each line does 3 things
 // actions to occur as soon as slider has been interacted with
-slider1.oninput = function() {
-	// set the printed output equal to the slider input
-	output1.innerHTML = slider1.value;
-	// replace the current plot with a new one
-	makePlot(data_series[String(slider1.value)+String(slider2.value)])
-}
+// set the printed output equal to the slider input
+// replace the current plot with a new one
 
-slider2.oninput = function() {
-	// set the printed output equal to the slider input
-	output2.innerHTML = slider2.value;
-	// replace the current plot with a new one
-	makePlot(data_series[String(slider1.value)+String(slider2.value)])
-}
+slider["uu"].oninput = function() {output["uu"].innerHTML = slider["uu"].value; movePlot(generateData(slider))}
+slider["uv"].oninput = function() {output["uv"].innerHTML = slider["uv"].value; movePlot(generateData(slider))}
+slider["vu"].oninput = function() {output["vu"].innerHTML = slider["vu"].value; movePlot(generateData(slider))}
+slider["vv"].oninput = function() {output["vv"].innerHTML = slider["vv"].value; movePlot(generateData(slider))}
+
+
+slider["n1"].oninput = function() {output["n1"].innerHTML = slider["n1"].value; movePlot(generateData(slider))}
+slider["c1"].oninput = function() {output["c1"].innerHTML = slider["c1"].value; movePlot(generateData(slider))}
+slider["v1"].oninput = function() {output["v1"].innerHTML = slider["v1"].value; movePlot(generateData(slider))}
+
+slider["n2"].oninput = function() {output["n2"].innerHTML = slider["n2"].value; movePlot(generateData(slider))}
+slider["c2"].oninput = function() {output["c2"].innerHTML = slider["c2"].value; movePlot(generateData(slider))}
+slider["v2"].oninput = function() {output["v2"].innerHTML = slider["v2"].value; movePlot(generateData(slider))}
+
+slider["n3"].oninput = function() {output["n3"].innerHTML = slider["n3"].value; movePlot(generateData(slider))}
+slider["c3"].oninput = function() {output["c3"].innerHTML = slider["c3"].value; movePlot(generateData(slider))}
+slider["v3"].oninput = function() {output["v3"].innerHTML = slider["v3"].value; movePlot(generateData(slider))}
+
+slider["n4"].oninput = function() {output["n4"].innerHTML = slider["n4"].value; movePlot(generateData(slider))}
+slider["c4"].oninput = function() {output["c4"].innerHTML = slider["c4"].value; movePlot(generateData(slider))}
+slider["v4"].oninput = function() {output["v4"].innerHTML = slider["v4"].value; movePlot(generateData(slider))}
+
+slider["n5"].oninput = function() {output["n5"].innerHTML = slider["n5"].value; movePlot(generateData(slider))}
+slider["c5"].oninput = function() {output["c5"].innerHTML = slider["c5"].value; movePlot(generateData(slider))}
+slider["v5"].oninput = function() {output["v5"].innerHTML = slider["v5"].value; movePlot(generateData(slider))}
+
+slider["n6"].oninput = function() {output["n6"].innerHTML = slider["n6"].value; movePlot(generateData(slider))}
+slider["c6"].oninput = function() {output["c6"].innerHTML = slider["c6"].value; movePlot(generateData(slider))}
+slider["v6"].oninput = function() {output["v6"].innerHTML = slider["v6"].value; movePlot(generateData(slider))}
+
+
+
+// gt the data in its default settings
+var initialData = generateData(slider)
+//start with the default plot
+makePlot(initialData)
+
+
 
 </script>
 
