@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<head>
+<style>
+.parent {
+  border: 1px solid black;
+  margin: 1rem;
+  padding: 2rem 2rem;
+  text-align: left;
+}
+.child {
+  display: inline-block;
+  border: 1px solid red;
+  padding: 1rem 1rem;
+  vertical-align: middle;
+  height:500px;
+}
+
+
+table {
+  border-collapse: collapse;
+}
+
+
+tr {
+  border-bottom: 1px solid #ddd;
+}  
+
+th {
+	padding-left: 20px
+  text-align: left;
+}
+
+td {padding-left: 20px}
+
+.slidecontainer {
+	
+	width: 150px;
+	
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 70px;
+  height: 10px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: #04AA6D;
+  cursor: pointer;
+</style>
+<title>Early epidemic model - two groups</title>
+</head>
+</head>
+
+<body>
+<div class="parent">
+<div class="child">
+<p>Infection rate</p>
+<table>
+  <tr>
+	<th>I->S</th>
+	<th>Group A</th>
+    <th>Group B</th>
+  </tr>
+  <tr>
+	<td><b>Group A</b></td>
+    <td><div class="slidecontainer">
+	<p> &beta;<sub>AA</sub> = <span id="AA"></span></p>
+  <input type="range" min="0" max="0.001" value="0.001" step="0.00001" id="AA_range" class=slider>
+</div></td>
+    <td><div class="slidecontainer">
+	<p> &beta;<sub>AB</sub> = <span id="AB"></span></p>
+	<input type="range" min="0" max="0.001" value="0.00005" step="0.00001" id="AB_range" class=slider>
+</div></td>
+  </tr>
+  <tr>
+	<td><b>Group B</b></td>
+    <td><div class="slidecontainer">
+	<p> &beta;<sub>BA</sub> = <span id="BA"></span></p>
+	<input type="range" min="0" max="0.001" value="0.00005" step="0.00001" id="BA_range" class=slider>
+</div></td>
+    <td><div class="slidecontainer">
+ <p> &beta;<sub>BB</sub> = <span id="BB"></span></p> 
+ <input type="range" min="0" max="0.001" value="0.0005" step="0.00001" id="BB_range" class=slider>
+ 
+</div></td>
+  </tr>
+</table>
+
+
+<div class="slidecontainer">
+ <p> Recovery rate &gamma; = <span id="gamma"></span></p> 
+ <input type="range" min="0" max="1" value="0.2" step="0.01" id="gamma_range" class=slider>
+</div>
+
+<div class="slidecontainer">
+ <p> s<sub>A</sub> = <span id="sA"></span> of 1000 </p> 
+ <input type="range" min="0" max="1000" value="100" step="10" id="sA_range" class=slider>
+</div>
+
+<div class="slidecontainer">
+ <p> Initial I<sub>A</sub> = <span id="IA"></span></p> 
+ <input type="range" min="0" max="10" value="1" step="1" id="IA_range" class=slider>
+</div>
+
+<div class="slidecontainer">
+ <p> Initial I<sub>B</sub> = <span id="IB"></span></p> 
+ <input type="range" min="0" max="10" value="0" step="1" id="IB_range" class=slider>
+</div>
+</div>
+
+<div class="child" id="myPlot" style="width:100%;max-width:700px"></div>
+
+<script>
+// start javascript
+// function for producing the data series
+function generateData(slider){
+
+	let variables = ["AA","AB","BA","BB","gamma","sA","IA","IB"];
+
+	
+	let p={};
+	
+	//take the variables that are in 'slider' and make the syntax shorter and convert ranges
+	for (let i = 0; i < variables.length;i++) {
+		p[variables[i]]=parseFloat(slider[variables[i]].value)
+	}
+
+	var sB = 1000 - p['sA']
+	// terms from the matrix
+	var AA = p['AA']*p['sA']-p['gamma']
+	var BB = p['BB']*sB-p['gamma']
+	var AB = p['AB']*sB
+	var BA = p['BA']*p['sA']
+	// terms from the quadratic eqn
+	var b = -(AA+BB)
+	var c = AA*BB-AB*BA
+	// compute the eigenvalues
+	var lambda_1 = (1/2)*(-b+Math.sqrt((b*b)-(4*c))) 
+	var lambda_2 = (1/2)*(-b-Math.sqrt((b*b)-(4*c))) 
+	// Calculate the coefficients for the formula	
+	var A1 = (AB*p['IB']-(lambda_2-AA)*p['IA'])/(lambda_1-lambda_2)
+	var A2 = ((lambda_1-AA)*p['IA']-AB*p['IB'])/(lambda_1-lambda_2)
+	
+	var B1 = A1*(lambda_1-AA)/AB
+	var B2 = A2*(lambda_2-AA)/AB
+	
+	var y_series_1 = []
+	var y_series_2 = []
+	// loop over values of t (time)
+	for (let t = 0; t < 101; t++){
+		
+		var IA=A1*Math.exp(lambda_1*t)+A2*Math.exp(lambda_2*t);
+		var IB=B1*Math.exp(lambda_1*t)+B2*Math.exp(lambda_2*t);
+		
+		// add the final comuted value at to to the output
+		y_series_1.push(IA);
+		y_series_2.push(IB);
+	}
+
+	var y_series_output = [y_series_1,y_series_2]
+return y_series_output;
+}
+
+
+// function for producing the plot
+function makePlot(yData){
+	var xArray = [];
+	for (let v = 0; v < 101;v++){
+		xArray.push(v)
+		}
+	
+	var yArray_1 = yData[0];
+	var yArray_2 = yData[1];
+	
+	var trace_A = {x: xArray, y: yArray_1, mode:"lines",line: {simplify: false},name: 'Group A'};
+	var trace_B = {x: xArray, y: yArray_2, mode:"lines",line: {simplify: false},name: 'Group B'};
+	
+	
+	var data = [trace_A,trace_B];
+
+	// Define Layout
+	var layout = {xaxis: {range: [0, 101], title: "Time"}, 
+				yaxis: {range: [-2, 3],type: 'log', title: "Number infected"},  
+				title: "Early epidemic dynamics - two groups",
+				};
+
+	// Display using Plotly
+	Plotly.newPlot("myPlot", {data:data, layout:layout});
+}
+
+// function for changing the plot data
+function movePlot(yData){
+
+	//var yArray_1 = yData[0];
+	//var yArray_2 = yData[1];
+	//document.getElementById("R0").innerHTML = yData;
+	Plotly.animate('myPlot', {data: [{y: yData[0]},{y: yData[1]}],
+    traces: [0,1],
+    layout: {}
+  }, {
+    transition: {duration: 0},
+    frame: {duration: 0}
+  });
+}
+
+
+
+let slider={}
+let output={}
+
+let variables = ["AA","AB","BA","BB","gamma","sA","IA","IB"];
+
+for (let i = 0; i < variables.length;i++) {   
+	//////////////////////////////////////////////////////
+	// "slider" is the object associated with the slider input     
+    slider[variables[i]] = document.getElementById(variables[i]+"_range");
+    // "output" is the what gets printed out
+	output[variables[i]] = document.getElementById(variables[i]);
+	
+	output[variables[i]].innerHTML = slider[variables[i]].value;
+}
+
+// annoyingly can't put oninput functions in a loop, so lots of coied code here:
+// each line does 3 things
+// actions to occur as soon as slider has been interacted with
+// set the printed output equal to the slider input
+// replace the current plot with a new one
+
+slider["AA"].oninput = function() {output["AA"].innerHTML = slider["AA"].value; movePlot(generateData(slider))}
+slider["AB"].oninput = function() {output["AB"].innerHTML = slider["AB"].value; movePlot(generateData(slider))}
+slider["BA"].oninput = function() {output["BA"].innerHTML = slider["BA"].value; movePlot(generateData(slider))}
+slider["BB"].oninput = function() {output["BB"].innerHTML = slider["BB"].value; movePlot(generateData(slider))}
+
+
+slider["gamma"].oninput = function() {output["gamma"].innerHTML = slider["gamma"].value; movePlot(generateData(slider))}
+slider["sA"].oninput = function() {output["sA"].innerHTML = slider["sA"].value; movePlot(generateData(slider))}
+slider["IA"].oninput = function() {output["IA"].innerHTML = slider["IA"].value; movePlot(generateData(slider))}
+slider["IB"].oninput = function() {output["IB"].innerHTML = slider["IB"].value; movePlot(generateData(slider))}
+
+// gt the data in its default settings
+var initialData = generateData(slider)
+//start with the default plot
+makePlot(initialData)
+
+
+
+</script>
+</body>
+</html>
