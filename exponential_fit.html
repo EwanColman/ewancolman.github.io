@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<head>
+<style>
+.parent {
+  border: 1px solid black;
+  margin: 1rem;
+  padding: 2rem 2rem;
+  text-align: left;
+}
+.child {
+  display: inline-block;
+  border: 1px solid red;
+  padding: 1rem 1rem;
+  vertical-align: middle;
+  height:500px;
+}
+
+
+table {
+  border-collapse: collapse;
+}
+
+
+tr {
+  border-bottom: 1px solid #ddd;
+}  
+
+th {
+	padding-left: 20px
+  text-align: left;
+}
+
+td {padding-left: 20px}
+
+.slidecontainer {
+	
+	width: 150px;
+	
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 70px;
+  height: 10px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: #4CAF50;
+  cursor: pointer;
+} 
+  
+/* ===== TOGGLE SWITCH ===== */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+}
+
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  background-color: #ccc;
+  border-radius: 28px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.3s;
+}
+
+.toggle-slider::before {
+  content: "";
+  position: absolute;
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.toggle input:checked + .toggle-slider {
+  background-color: #4CAF50;
+}
+
+.toggle input:checked + .toggle-slider::before {
+  transform: translateX(24px);
+}
+ 
+</style>
+<title>Exponential fitting</title>
+</head>
+
+
+<body>
+<div class="parent">
+<div class="child">
+
+<div class="slidecontainer">
+ <p> A = <span id="A"></span></p> 
+ <input type="range" min="0" max="2" value="1" step="0.001" id="A_range" class=slider>
+</div>
+
+<div class="slidecontainer">
+ <p> B = <span id="B"></span></p> 
+ <input type="range" min="0" max="0.5" value="0.2" step="0.001" id="B_range" class=slider>
+</div>
+
+<div class="slidecontainer">
+<p> &nbsp </p>
+<input type="checkbox" id="log_range" value="off">
+<label for="log_range">Logarithmic axis</label>
+<!-- <input type="range" min="0" max="1" value="0" step="1" id="log_range" class=slider>  -->
+  <!-- Toggle Switch -->
+<!-- <label class="toggle">
+  <input type="checkbox" id="log_range">
+  <span class="toggle-slider"></span>
+</label> -->
+</div>
+
+</div>
+
+<div class="child" id="myPlot" style="width:100%;max-width:700px"></div>
+
+<script>
+// start javascript
+// function for producing the data series
+function generateData(slider){
+
+	let variables = ["A","B"];
+
+	
+	let p={};
+	
+	//take the variables that are in 'slider' and make the syntax shorter and convert ranges
+	for (let i = 0; i < variables.length;i++) {
+		p[variables[i]]=parseFloat(slider[variables[i]].value)
+	}
+
+
+	var A = p['A']
+	var B = p['B']
+	
+	var y_series = []
+	// loop over values of t (time)
+	for (let t = 0; t < 170; t++){
+		
+		var y=A*Math.exp(B*(t/10));
+		// add the final comuted value at to to the output
+		y_series.push(y);
+	}
+
+
+return y_series;
+}
+
+
+// function for producing the plot
+function makePlot(yData){
+	var xArray_1 = [];
+	for (let v = 0; v < 170;v++){
+		xArray_1.push(v/10)
+		}
+	
+	var xArray_2 = [];
+	for (let v = 0; v < 17;v++){
+		xArray_2.push(v)
+		}
+	
+	var yArray_1 = yData;
+	var yArray_2 = [0,1,0,1,2,0,0,2,5,1,6,10,11,15,28,41]
+
+	
+	var trace_A = {x: xArray_1, y: yArray_1, mode:"lines",line: {simplify: false},name: 'y = Ae<sup>Bt</sup>'};
+	var trace_B = {x: xArray_2, y: yArray_2, mode: 'markers', type: 'scatter', name: 'Observed data'};
+	var data = [trace_A,trace_B];
+
+	// axis
+	
+	// Define Layout
+	// based on checked value
+	if (slider["log"].checked==true) {
+		//  block of code to be executed if the condition is true
+		var layout = {xaxis: {range: [-0.5, 17.5], title: "Time", tickvals: [0, 5, 10, 15], ticktext: ['March 1', 'March 6', 'March 11', 'March 16']}, 
+				yaxis: {range: [-1, 2], type: 'log', title: "y", tickvals: [1, 10, 100]},  //type: 'log'
+				title: "Exponential fit",
+
+				};
+	} else {
+	var layout = {xaxis: {range: [-0.5, 17.5], title: "Time", tickvals: [0, 5, 10, 15], ticktext: ['March 1', 'March 6', 'March 11', 'March 16']}, 
+				yaxis: {range: [0, 60], title: "y", tickvals: [0, 10, 20, 30, 40, 50],}, 
+				title: "Exponential fit",
+
+				};
+			}
+
+	// Display using Plotly
+	Plotly.newPlot("myPlot", {data:data, layout:layout});
+}
+
+// function for changing the plot data
+function movePlot(yData){
+
+	//var yArray_1 = yData[0];
+	//var yArray_2 = yData[1];
+	//document.getElementById("R0").innerHTML = yData;
+	Plotly.animate('myPlot', {data: [{y: yData}],
+    traces: [0,1],
+    layout: {}
+  }, {
+    transition: {duration: 0},
+    frame: {duration: 0}
+  });
+}
+
+
+
+let slider={}
+let output={}
+
+let variables = ["A","B"];
+
+for (let i = 0; i < variables.length;i++) {   
+	//////////////////////////////////////////////////////
+	// "slider" is the object associated with the slider input     
+    slider[variables[i]] = document.getElementById(variables[i]+"_range");
+    // "output" is the what gets printed out
+	output[variables[i]] = document.getElementById(variables[i]);
+	
+	output[variables[i]].innerHTML = slider[variables[i]].value;
+}
+
+slider["log"] = document.getElementById("log_range");
+
+  slider["log"].addEventListener("change", () => {
+    //output["log"].textContent = slider["log"].checked ? "On" : "Off";
+	makePlot(generateData(slider));
+  });
+
+// annoyingly can't put oninput functions in a loop, so lots of coied code here:
+// each line does 3 things
+// actions to occur as soon as slider has been interacted with
+// set the printed output equal to the slider input
+// replace the current plot with a new one
+
+slider["A"].oninput = function() {output["A"].innerHTML = slider["A"].value; movePlot(generateData(slider))}
+slider["B"].oninput = function() {output["B"].innerHTML = slider["B"].value; movePlot(generateData(slider))}
+//slider["log"].oninput = function() {output["log"].innerHTML = slider["log"].value; makePlot(generateData(slider))}
+
+
+// gt the data in its default settings
+var initialData = generateData(slider)
+//start with the default plot
+makePlot(initialData)
+
+
+
+</script>
+</body>
+</html>
