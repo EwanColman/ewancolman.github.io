@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+<head>
+<style>
+.parent {
+  border: 1px solid black;
+  margin: 1rem;
+  padding: 2rem 2rem;
+  text-align: left;
+}
+.child {
+  display: inline-block;
+  border: 1px solid red;
+  padding: 1rem 1rem;
+  vertical-align: middle;
+  height:500px;
+}
+
+
+table {
+  border-collapse: collapse;
+}
+
+
+tr {
+  border-bottom: 1px solid #ddd;
+}  
+
+th {
+	padding-left: 20px
+  text-align: left;
+}
+
+td {padding-left: 20px}
+
+.slidecontainer {
+	
+	width: 150px;
+	
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 70px;
+  height: 10px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: #04AA6D;
+  cursor: pointer;
+</style>
+<title>Early epidemic model - two groups</title>
+</head>
+</head>
+
+<body>
+<div class="parent">
+<div class="child">
+<p>Infection rate</p>
+
+<div class="slidecontainer">
+ <p> Infection rate &beta; = <span id="beta"></span></p> 
+ <input type="range" min="0" max="1" value="0.2" step="0.01" id="beta_range" class=slider>
+</div>
+
+<div class="slidecontainer">
+ <p> Recovery rate &gamma; = <span id="gamma"></span></p> 
+ <input type="range" min="0" max="1" value="0.2" step="0.01" id="gamma_range" class=slider>
+</div>
+
+<div class="slidecontainer">
+ <p> Initial I = <span id="I"></span></p> 
+ <input type="range" min="0" max="10" value="1" step="1" id="I_range" class=slider>
+</div>
+
+
+</div>
+
+<div class="child" id="myPlot" style="width:100%;max-width:700px"></div>
+
+<script>
+// start javascript
+// function for producing the data series
+function generateData(slider){
+
+	let variables = ["beta","gamma","I"];
+
+	let p={};
+	
+	//take the variables that are in 'slider' and make the syntax shorter and convert ranges
+	for (let i = 0; i < variables.length;i++) {
+		p[variables[i]]=parseFloat(slider[variables[i]].value)
+	}
+
+
+	var h = 0.01
+	var increments_per_unit_time = Math.round(1/h)
+	var t = 0
+	var i = 0
+	var N = 1000
+	var beta = p['beta']
+	var gamma = p['gamma']
+	var S = N - p['I']
+	var I = p['I']	
+	var R = 0
+
+	var S_series = []
+	var I_series = []
+	var R_series = []
+	// loop over values of t (time)
+	while (t < 101){
+
+		S_new = S + h*(-beta*S*I/N);
+		I_new = I + h*(beta*S*I/N - gamma*I);
+		R_new = R + h*(gamma*I);
+		
+		S = S_new;
+		I = I_new;
+		R = R_new;
+		
+
+	
+		if (i==increments_per_unit_time){
+			i = 0;
+			S_series.push(S);
+			I_series.push(I);
+			R_series.push(R);
+			}
+			
+		t = t + h
+		i++
+	}
+
+	var y_series_output = [S_series,I_series,R_series]
+return y_series_output;
+}
+
+
+// function for producing the plot
+function makePlot(yData){
+	var xArray = [];
+	for (let v = 0; v < 101;v++){
+		xArray.push(v)
+		}
+	
+	var yArray_1 = yData[0];
+	var yArray_2 = yData[1];
+	var yArray_3 = yData[2];
+	
+	var trace_S = {x: xArray, y: yArray_1, mode:"lines",line: {simplify: false},name: 'S'};
+	var trace_I = {x: xArray, y: yArray_2, mode:"lines",line: {simplify: false},name: 'I'};
+	var trace_R = {x: xArray, y: yArray_3, mode:"lines",line: {simplify: false},name: 'R'};
+	
+	
+	var data = [trace_S,trace_I,trace_R];
+
+	// Define Layout
+	var layout = {xaxis: {range: [0, 101], title: "Time"}, 
+				yaxis: {range: [0, 1000], title: "SIR output"},  
+				title: "Dynamics of the SIR model",
+				};
+
+	// Display using Plotly
+	Plotly.newPlot("myPlot", {data:data, layout:layout});
+}
+
+// function for changing the plot data
+function movePlot(yData){
+
+	//var yArray_1 = yData[0];
+	//var yArray_2 = yData[1];
+	//document.getElementById("R0").innerHTML = yData;
+	Plotly.animate('myPlot', {data: [{y: yData[0]},{y: yData[1]},{y: yData[2]}],
+    traces: [0,1,2],
+    layout: {}
+  }, {
+    transition: {duration: 0},
+    frame: {duration: 0}
+  });
+}
+
+
+
+let slider={}
+let output={}
+
+let variables = ["beta","gamma","I"];;
+
+for (let i = 0; i < variables.length;i++) {   
+	//////////////////////////////////////////////////////
+	// "slider" is the object associated with the slider input     
+    slider[variables[i]] = document.getElementById(variables[i]+"_range");
+    // "output" is the what gets printed out
+	output[variables[i]] = document.getElementById(variables[i]);
+	
+	output[variables[i]].innerHTML = slider[variables[i]].value;
+}
+
+// annoyingly can't put oninput functions in a loop, so lots of coied code here:
+// each line does 3 things
+// actions to occur as soon as slider has been interacted with
+// set the printed output equal to the slider input
+// replace the current plot with a new one
+
+slider["beta"].oninput = function() {output["beta"].innerHTML = slider["beta"].value; movePlot(generateData(slider))}
+slider["gamma"].oninput = function() {output["gamma"].innerHTML = slider["gamma"].value; movePlot(generateData(slider))}
+slider["I"].oninput = function() {output["I"].innerHTML = slider["I"].value; movePlot(generateData(slider))}
+
+// gt the data in its default settings
+var initialData = generateData(slider)
+//start with the default plot
+makePlot(initialData)
+
+
+
+</script>
+</body>
+</html>

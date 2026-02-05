@@ -80,36 +80,30 @@ td {padding-left: 20px}
 	<td><b>Group A</b></td>
     <td><div class="slidecontainer">
 	<p> &beta;<sub>AA</sub> = <span id="AA"></span></p>
-  <input type="range" min="0" max="0.001" value="0.001" step="0.00001" id="AA_range" class=slider>
+  <input type="range" min="0" max="1" value="0.1" step="0.001" id="AA_range" class=slider>
 </div></td>
     <td><div class="slidecontainer">
 	<p> &beta;<sub>AB</sub> = <span id="AB"></span></p>
-	<input type="range" min="0" max="0.001" value="0.00005" step="0.00001" id="AB_range" class=slider>
+	<input type="range" min="0" max="0.1" value="0.005" step="0.0001" id="AB_range" class=slider>
 </div></td>
   </tr>
   <tr>
 	<td><b>Group B</b></td>
     <td><div class="slidecontainer">
 	<p> &beta;<sub>BA</sub> = <span id="BA"></span></p>
-	<input type="range" min="0" max="0.001" value="0.00005" step="0.00001" id="BA_range" class=slider>
+	<input type="range" min="0" max="0.1" value="0.045" step="0.0001" id="BA_range" class=slider>
 </div></td>
     <td><div class="slidecontainer">
  <p> &beta;<sub>BB</sub> = <span id="BB"></span></p> 
- <input type="range" min="0" max="0.001" value="0.0005" step="0.00001" id="BB_range" class=slider>
+ <input type="range" min="0" max="1" value="0.45" step="0.001" id="BB_range" class=slider>
  
 </div></td>
   </tr>
 </table>
 
-
 <div class="slidecontainer">
  <p> Recovery rate &gamma; = <span id="gamma"></span></p> 
  <input type="range" min="0" max="1" value="0.2" step="0.01" id="gamma_range" class=slider>
-</div>
-
-<div class="slidecontainer">
- <p> s<sub>A</sub> = <span id="sA"></span> of 1000 </p> 
- <input type="range" min="0" max="1000" value="100" step="10" id="sA_range" class=slider>
 </div>
 
 <div class="slidecontainer">
@@ -130,7 +124,7 @@ td {padding-left: 20px}
 // function for producing the data series
 function generateData(slider){
 
-	let variables = ["AA","AB","BA","BB","gamma","sA","IA","IB"];
+	let variables = ["AA","AB","BA","BB","gamma","IA","IB"];
 
 	
 	let p={};
@@ -140,12 +134,12 @@ function generateData(slider){
 		p[variables[i]]=parseFloat(slider[variables[i]].value)
 	}
 
-	var sB = 1000 - p['sA']
+	
 	// terms from the matrix
-	var AA = p['AA']*p['sA']-p['gamma']
-	var BB = p['BB']*sB-p['gamma']
-	var AB = p['AB']*sB
-	var BA = p['BA']*p['sA']
+	var AA = p['AA']-p['gamma']
+	var BB = p['BB']-p['gamma']
+	var AB = p['AB']
+	var BA = p['BA']
 	// terms from the quadratic eqn
 	var b = -(AA+BB)
 	var c = AA*BB-AB*BA
@@ -223,7 +217,7 @@ function movePlot(yData){
 let slider={}
 let output={}
 
-let variables = ["AA","AB","BA","BB","gamma","sA","IA","IB"];
+let variables = ["AA","AB","BA","BB","gamma","IA","IB"];
 
 for (let i = 0; i < variables.length;i++) {   
 	//////////////////////////////////////////////////////
@@ -248,7 +242,6 @@ slider["BB"].oninput = function() {output["BB"].innerHTML = slider["BB"].value; 
 
 
 slider["gamma"].oninput = function() {output["gamma"].innerHTML = slider["gamma"].value; movePlot(generateData(slider))}
-slider["sA"].oninput = function() {output["sA"].innerHTML = slider["sA"].value; movePlot(generateData(slider))}
 slider["IA"].oninput = function() {output["IA"].innerHTML = slider["IA"].value; movePlot(generateData(slider))}
 slider["IB"].oninput = function() {output["IB"].innerHTML = slider["IB"].value; movePlot(generateData(slider))}
 
